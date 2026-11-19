@@ -12,9 +12,20 @@
     background:#0d0d12; color:#e8e8f0; min-height:100vh;
     padding:16px 16px 90px; max-width:480px; margin:0 auto;
   }
-  h1 { font-size:22px; text-align:center; margin-bottom:14px;
-       background:linear-gradient(90deg,#ff5c8a,#a06bff);
-       -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  /* ---- Top bar ---- */
+  .topbar {
+    position:sticky; top:0; z-index:90; margin:-16px -16px 14px; padding:10px 16px;
+    background:#0d0d12ee; backdrop-filter:blur(10px); border-bottom:1px solid #1f1f2c;
+    display:flex; align-items:center; gap:12px;
+  }
+  .tb-ava { width:48px; height:48px; border-radius:15px; overflow:hidden; flex-shrink:0;
+            cursor:pointer; border:2px solid #3a3a4a; background:#2a2a3a; }
+  .tb-ava svg { display:block; }
+  .tb-info { flex:1; min-width:0; }
+  .tb-name { font-size:15px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tb-status { display:flex; align-items:center; gap:6px; margin-top:3px; font-size:11px; flex-wrap:wrap; }
+  .tb-tier { padding:2px 8px; border-radius:10px; font-weight:700; }
+  .tb-res { text-align:right; font-size:12px; font-weight:700; line-height:1.5; flex-shrink:0; }
   .money { color:#ffd166; } .looks { color:#ff5c8a; } .iq { color:#6bd6ff; }
   .status { color:#a06bff; } .aura { color:#7dffa8; }
   .hidden { display:none; }
@@ -28,6 +39,7 @@
   .card .icon { font-size:24px; }
   .card .name { font-size:13px; font-weight:600; margin:6px 0 2px; }
   .card .desc { font-size:11px; color:#9a9ab0; line-height:1.35; }
+  .card .eff { font-size:11px; color:#7dffa8; margin-top:6px; line-height:1.35; }
   .card .cost { font-size:11px; color:#ffd166; margin-top:6px; }
   .btn-big {
     width:100%; padding:14px; border:none; border-radius:14px; font-size:15px; font-weight:700;
@@ -60,6 +72,62 @@
   }
   .daily .d-title { font-size:14px; font-weight:700; margin-bottom:4px; }
   .daily .d-desc { font-size:11px; color:#9a9ab0; margin-bottom:10px; }
+
+  /* ---- Profile overlay ---- */
+  .overlay { position:fixed; inset:0; z-index:150; background:#0d0d12; overflow-y:auto; padding:16px 16px 40px; }
+  .overlay-in { max-width:480px; margin:0 auto; }
+  .back-btn { background:none; border:none; color:#b8b8cc; font-size:14px; padding:4px 0 14px; cursor:pointer; }
+
+  /* ---- Relations (dating) ---- */
+  .relbar { display:flex; align-items:center; gap:12px; background:#1a1a24; border:1px solid #2a2a3a;
+            border-radius:16px; padding:10px 12px; margin-bottom:12px; }
+  .rb-ava { width:52px; height:52px; border-radius:16px; overflow:hidden; background:#2a2a3a; flex-shrink:0; }
+  .rb-ava svg, .m-ava svg { display:block; }
+  .rb-txt { flex:1; min-width:0; }
+  .rb-t { font-size:11px; color:#9a9ab0; }
+  .rb-n { font-size:15px; font-weight:700; }
+  .rb-s { font-size:12px; color:#b8b8cc; margin-top:2px; }
+  .rb-btn { border:1px solid #3a3a4a; background:#14141c; color:#ff7b7b; border-radius:12px;
+            padding:8px 12px; font-size:13px; cursor:pointer; }
+  .reltabs { display:flex; gap:8px; margin-bottom:12px; }
+  .rtab { flex:1; padding:9px; border-radius:12px; border:1px solid #2a2a3a; background:#1a1a24;
+          color:#9a9ab0; font-size:13px; font-weight:600; cursor:pointer; }
+  .rtab.active { color:#fff; border-color:#a06bff; background:#241a2e; }
+  .swipe-area { position:relative; height:400px; margin-bottom:14px; }
+  .gcard { position:absolute; inset:0; border-radius:22px; overflow:hidden; background:#1a1a24;
+           border:1px solid #2a2a3a; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+  .gcard.top { cursor:grab; }
+  .gcard.behind { transform:scale(.95) translateY(12px); opacity:.65; }
+  .gpic { position:absolute; inset:0; pointer-events:none; }
+  .gpic svg { display:block; width:100%; height:100%; }
+  .ginfo { position:absolute; left:0; right:0; bottom:0; padding:48px 14px 14px;
+           background:linear-gradient(transparent,#000d 55%); pointer-events:none; }
+  .gname { font-size:20px; font-weight:800; }
+  .gchips { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .chip { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; background:#ffffff1f; }
+  .chip.st { background:#a06bff44; color:#e3d2ff; }
+  .chip.lk { color:#ff8fb0; }
+  .gbio { font-size:12px; color:#d0d0e0; margin-top:8px; line-height:1.4; }
+  .stamp { position:absolute; top:22px; padding:3px 12px; border:3px solid; border-radius:10px;
+           font-weight:900; font-size:22px; opacity:0; pointer-events:none; }
+  .stamp.like { left:18px; color:#7dffa8; transform:rotate(-12deg); }
+  .stamp.nope { right:18px; color:#ff5c6a; transform:rotate(12deg); }
+  .swipe-btns { display:flex; justify-content:center; gap:30px; }
+  .rbtn { width:66px; height:66px; border-radius:50%; border:2px solid; background:#1a1a24;
+          font-size:26px; cursor:pointer; }
+  .rbtn.nope { border-color:#ff5c6a; } .rbtn.like { border-color:#7dffa8; }
+  .rbtn:active { transform:scale(.92); }
+  .swipe-hint { text-align:center; font-size:11px; color:#9a9ab0; margin-top:10px; }
+  .match { display:flex; gap:12px; align-items:center; background:#1a1a24; border:1px solid #2a2a3a;
+           border-radius:16px; padding:10px; margin-bottom:10px; }
+  .m-ava { width:64px; height:64px; border-radius:18px; overflow:hidden; flex-shrink:0; background:#2a2a3a; }
+  .m-body { flex:1; min-width:0; }
+  .m-name { font-size:15px; font-weight:700; }
+  .m-btns { display:flex; gap:6px; margin-top:8px; }
+  .m-btns button { border:none; border-radius:10px; padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+  .m-go { background:linear-gradient(90deg,#ff5c8a,#a06bff); color:#fff; }
+  .m-del { background:#2a2a3a; color:#b8b8cc; }
+  .empty-note { text-align:center; color:#9a9ab0; font-size:13px; padding:30px 10px; line-height:1.5; }
 
   /* ---- Battle ---- */
   .opp {
@@ -104,7 +172,14 @@
 </style>
 </head>
 <body>
-<h1>Mog Life</h1>
+<header class="topbar">
+  <div class="tb-ava" id="tbAva" title="Профиль"></div>
+  <div class="tb-info">
+    <div class="tb-name" id="tbName">Ты</div>
+    <div class="tb-status"><span class="tb-tier" id="tbTier"></span><span class="status" id="tbStatus">👑 0</span></div>
+  </div>
+  <div class="tb-res"><div class="money" id="tbMoney">0</div><div class="aura" id="tbEnergy">⚡ 100</div></div>
+</header>
 
 <!-- ПРОКАЧКА -->
 <div id="train" class="section">
@@ -134,12 +209,18 @@
 
 <!-- ОТНОШЕНИЯ -->
 <div id="rel" class="section hidden">
-  <button class="btn-big" id="shootShot">mog</button>
-  <div id="relInfo" style="margin-top:12px;font-size:14px;text-align:center;color:#b8b8cc;line-height:1.6"></div>
+  <div class="relbar" id="relBar"></div>
+  <div class="reltabs">
+    <button class="rtab active" data-rt="deck">🔥 Анкеты</button>
+    <button class="rtab" data-rt="matches" id="rtMatches">💞 Мэтчи</button>
+  </div>
+  <div id="relDeck"></div>
+  <div id="relMatches" class="hidden"></div>
 </div>
 
 <!-- ПРОФИЛЬ -->
-<div id="profile" class="section hidden">
+<div id="profile" class="overlay hidden"><div class="overlay-in">
+  <button class="back-btn" id="profClose">← Назад</button>
   <div class="profile-top">
     <div class="avatar-wrap">
       <div class="avatar-ring" id="avaRing"></div>
@@ -165,7 +246,7 @@
     <button class="btn-big" id="dailyBtn">Забрать</button>
   </div>
   <button class="btn-ghost" id="resetBtn" style="margin-top:16px;color:#ff7b7b">Сбросить прогресс</button>
-</div>
+</div></div>
 
 <nav class="bottomnav">
   <button class="navitem active" data-tab="train"><span class="ic">🏋️</span>Качалка</button>
@@ -173,7 +254,6 @@
   <button class="navitem" data-tab="battle"><span class="ic">⚔️</span>Mog</button>
   <button class="navitem" data-tab="estate"><span class="ic">🏠</span>Недвижка</button>
   <button class="navitem" data-tab="rel"><span class="ic">❤️</span>Отношения</button>
-  <button class="navitem" data-tab="profile"><span class="ic">👤</span>Профиль</button>
 </nav>
 
 <div class="toast" id="toast"></div>
@@ -181,14 +261,25 @@
 <script>
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0d0d12'); }
-const playerName = tg?.initDataUnsafe?.user?.first_name || 'Ты';
+const tgUser = tg?.initDataUnsafe?.user;
+const playerName = tgUser?.username || tgUser?.first_name || 'Ты';
+const pick = a => a[Math.floor(Math.random()*a.length)];
 
 // ---------- Состояние ----------
 const DEFAULTS = { money:500, looks:3.0, iq:70, status:0, aura:0, energy:100,
-  biz:[], estate:[], rel:null, streak:0, lastDaily:null, opps:null, oppsTime:0 };
+  biz:[], estate:[], rel:null, streak:0, lastDaily:null, opps:null, oppsTime:0,
+  girls:null, matches:[] };
 let S = load();
-function load(){ try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('moglife'))); }
-  catch(e){ return {...DEFAULTS}; } }
+function load(){
+  let d;
+  try { d = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('moglife'))); }
+  catch(e){ d = {...DEFAULTS}; }
+  // чиним битые числа (например NaN, попавший в сохранение)
+  ['money','looks','iq','status','aura','energy'].forEach(k => { if (!Number.isFinite(d[k])) d[k] = DEFAULTS[k]; });
+  if (!Array.isArray(d.matches)) d.matches = [];
+  d.biz = d.biz || []; d.estate = d.estate || [];
+  return d;
+}
 function save(){ localStorage.setItem('moglife', JSON.stringify(S)); }
 
 // ---------- Тиры ----------
@@ -197,48 +288,65 @@ function getTier(l){
   if(l<5)  return {n:'LTN', e:'🙁', c:'#ff9a5c', bg:'#3a2a1a', d:'Low-Tier Normie. Уже не саб, но пахнет.'};
   if(l<6)  return {n:'MTN', e:'😐', c:'#ffd166', bg:'#3a3a1a', d:'Mid-Tier Normie. В толпе не выделяешься.'};
   if(l<7)  return {n:'HTN', e:'🙂', c:'#a8e05c', bg:'#22301a', d:'High-Tier Normie. Девчонки начинают смотреть.'};
-  if(l<8)  return {n:'Чад Лайт', e:'😎', c:'#5cd6a0', bg:'#1a3028', d:'Chadlite. Могешь почти всех. Почти.'};
+  if(l<8)  return {n:'Чад Лайт', e:'😎', c:'#5cd6a0', bg:'#1a3028', d:'Chadlite. Можешь почти всех. Почти.'};
   if(l<9)  return {n:'Чад', e:'😈', c:'#5cb8ff', bg:'#1a2838', d:'Chad. Люди оборачиваются.'};
   return {n:'Тру Адам', e:'🗿', c:'#c89aff', bg:'#2a1a3a', d:'True Adam. Первый человек. Идеал.'};
 }
 
 // ---------- Данные ----------
 const TRAIN = [
-  { id:'gym',   icon:'🏋️', name:'Зал',        desc:'+0.2 лукс, +сила. Дрип не дрип, а качок — важно.', cost:100, energy:20, fx:s=>{s.looks+=0.2; s.status+=1;} },
-  { id:'face',  icon:'🧴', name:'Уход за лицом', desc:'+0.15 лукс. Скинкеар-рутина, санскрин каждый день.', cost:150, energy:10, fx:s=>{s.looks+=0.15;} },
-  { id:'hair',  icon:'💇', name:'Причёска',    desc:'+0.3 лукс. Фейд + текстура, только так.', cost:300, energy:5, fx:s=>{s.looks+=0.3;} },
-  { id:'style', icon:'👕', name:'Одежда',      desc:'+0.4 лукс. Подобранный вайб, а не просто дорого.', cost:800, energy:5, fx:s=>{s.looks+=0.4;} },
-  { id:'books', icon:'📚', name:'Читать',      desc:'+3 IQ. Книги по переговорам и биохакингу.', cost:50, energy:15, fx:s=>{s.iq+=3;} },
-  { id:'course',icon:'🎓', name:'Курсы',       desc:'+8 IQ. Платное обучение, нетворкинг.', cost:1000, energy:25, fx:s=>{s.iq+=8; s.status+=2;} },
-  { id:'jaw',   icon:'🏥', name:'Операция (эстет.)', desc:'+1.0 лукс. Ментопластика/рино. Больно, но того стоит.', cost:10000, energy:60, fx:s=>{s.looks+=1.0; s.status+=3; s.aura-=5;} },
-  { id:'sleep', icon:'😴', name:'Восстановиться', desc:'+60 энергии. Сон — главный буст.', cost:0, energy:-60, fx:s=>{} },
+  { id:'gym',   icon:'🏋️', name:'Зал', desc:'Железо, подходы и дисциплина. Тело — первое, что замечают люди, поэтому зал не пропускают.',
+    eff:'🔥 +0.2 лукс · 👑 +1 статус', cost:100, energy:20, fx:s=>{s.looks+=0.2; s.status+=1;} },
+  { id:'face',  icon:'🧴', name:'Уход за лицом', desc:'Умывание, крем и санскрин каждый день. Чистая кожа — основа любого образа.',
+    eff:'🔥 +0.15 лукс', cost:150, energy:10, fx:s=>{s.looks+=0.15;} },
+  { id:'hair',  icon:'💇', name:'Причёска', desc:'Поход к хорошему барберу: фейд, текстура и укладка, которая держится весь день.',
+    eff:'🔥 +0.3 лукс', cost:300, energy:5, fx:s=>{s.looks+=0.3;} },
+  { id:'style', icon:'👕', name:'Одежда', desc:'Вещи, которые хорошо сидят и собираются в единый образ. Важен вайб, а не ценник.',
+    eff:'🔥 +0.4 лукс', cost:800, energy:5, fx:s=>{s.looks+=0.4;} },
+  { id:'books', icon:'📚', name:'Читать', desc:'Книги по переговорам, психологии и биохакингу. Недорого, а голова работает лучше.',
+    eff:'🧠 +3 IQ', cost:50, energy:15, fx:s=>{s.iq+=3;} },
+  { id:'course',icon:'🎓', name:'Курсы', desc:'Платное обучение с наставником и полезными знакомствами. Дорого, зато открывает двери.',
+    eff:'🧠 +8 IQ · 👑 +2 статуса', cost:1000, energy:25, fx:s=>{s.iq+=8; s.status+=2;} },
+  { id:'jaw',   icon:'🏥', name:'Операция (эстет.)', desc:'Ментопластика или ринопластика. Тяжёлое восстановление, но результат заметен сразу.',
+    eff:'🔥 +1.0 лукс · 👑 +3 · ✨ −5 ауры', cost:10000, energy:60, fx:s=>{s.looks+=1.0; s.status+=3; s.aura-=5;} },
+  { id:'sleep', icon:'😴', name:'Восстановиться', desc:'Нормальный здоровый сон. Без него остальные занятия просто не потянуть.',
+    eff:'⚡ +60 энергии', cost:0, energy:-60, fx:s=>'😴 Выспался: +60 энергии' },
 ];
 const BIZ = [
-  { id:'dropship', icon:'📦', name:'Дропшиппинг',   cost:2000,   income:80 },
-  { id:'salon',    icon:'💈', name:'Барбершоп',     cost:8000,   income:350 },
-  { id:'gymbiz',   icon:'🏢', name:'Сеть залов',    cost:30000,  income:1500 },
-  { id:'brand',    icon:'🚀', name:'Свой бренд',    cost:100000, income:6000 },
-  { id:'agency',   icon:'📱', name:'SMM-агентство', cost:250000, income:16000 },
+  { id:'dropship', icon:'📦', name:'Дропшиппинг',   desc:'Продаёшь товары с маркетплейсов без своего склада. Доход небольшой, зато стабильный.', cost:2000,   income:80 },
+  { id:'salon',    icon:'💈', name:'Барбершоп',     desc:'Небольшая мужская парикмахерская. Постоянные клиенты приносят деньги каждый день.', cost:8000,   income:350 },
+  { id:'gymbiz',   icon:'🏢', name:'Сеть залов',    desc:'Несколько залов по городу. Абонементы платят за тебя, пока ты занят другим.', cost:30000,  income:1500 },
+  { id:'brand',    icon:'🚀', name:'Свой бренд',    desc:'Собственная линейка одежды и ухода. Узнаваемость растёт, а вместе с ней и прибыль.', cost:100000, income:6000 },
+  { id:'agency',   icon:'📱', name:'SMM-агентство', desc:'Команда продвигает чужие аккаунты, а ты только подписываешь договоры.', cost:250000, income:16000 },
 ];
 // Активный заработок
 const GRIND = [
-  { id:'tiktok', icon:'🎵', name:'Выложить TikTok', desc:'Дохід зависит от лукса и ауры. Формула: фпс-максинг.', cost:0, energy:15,
+  { id:'tiktok', icon:'🎵', name:'Выложить TikTok', desc:'Снимаешь короткое видео и выкладываешь. Чем лучше выглядишь и выше аура, тем больше просмотров и денег.',
+    eff:'💰 зависит от лукса и ауры · 👑 +1', cost:0, energy:15,
     fx:s=>{ const gain = Math.round(30 + s.looks*60 + s.aura*4 + Math.random()*200); s.money+=gain; s.status+=1;
       return `TikTok залетел: +${gain}₽`; } },
-  { id:'stream', icon:'🎥', name:'Стрим по луксмаксу', desc:'Рассказываешь про хаирсистемы. Доход = лукс × 90.', cost:0, energy:25,
+  { id:'stream', icon:'🎥', name:'Стрим по луксмаксу', desc:'Прямой эфир про уход, причёски и привычки. Зрители донатят тем больше, чем выше лукс и IQ.',
+    eff:'💰 примерно лукс × 90 + IQ × 2', cost:0, energy:25,
     fx:s=>{ const gain = Math.round(s.looks*90 + s.iq*2 + Math.random()*150); s.money+=gain;
       return `Донаты со стрима: +${gain}₽`; } },
-  { id:'course2', icon:'🎓', name:'Курс по луксмаксингу', desc:'Нужен лукс 6+. Продаёшь мечту сабам.', cost:0, energy:50, req:s=>s.looks>=6,
+  { id:'course2', icon:'🎓', name:'Курс по луксмаксингу', desc:'Продаёшь свой курс о том, как улучшить внешность. Нужен лукс 6+, иначе тебе никто не поверит.',
+    eff:'💰 1 000 + лукс × 300 · ✨ +2 · 👑 +3', cost:0, energy:50, req:s=>s.looks>=6,
     fx:s=>{ const gain = Math.round(1000 + s.looks*300 + s.aura*10); s.money+=gain; s.aura+=2; s.status+=3;
       return `Сабы скупили курс: +${gain}₽`; } },
 ];
 const ESTATE = [
-  { id:'room',  icon:'🏚️', name:'Снять съёмку',  desc:'+2 статуса. Своя берлога.', cost:5000, fx:s=>{s.status+=2;} },
-  { id:'flat',  icon:'🏠', name:'Квартира в центре', desc:'+25 статуса', cost:50000, fx:s=>{s.status+=25;} },
-  { id:'car',   icon:'🚗', name:'Бэха/Мэрс', desc:'+15 статуса', cost:40000, fx:s=>{s.status+=15;} },
-  { id:'watch', icon:'⌚', name:'Часы', desc:'+5 статуса', cost:15000, fx:s=>{s.status+=5;} },
-  { id:'penthouse', icon:'🏙️', name:'Пентхаус', desc:'+60 статуса', cost:300000, fx:s=>{s.status+=60;} },
-  { id:'charity', icon:'🎗️', name:'Благотворительность', desc:'+4 статуса, +10 ауры', cost:5000, fx:s=>{s.status+=4; s.aura+=10;} },
+  { id:'room',  icon:'🏚️', name:'Снять комнату', desc:'Небольшая съёмная комната. Скромно, зато своё личное пространство.',
+    eff:'👑 +2 статуса', cost:5000, fx:s=>{s.status+=2;} },
+  { id:'flat',  icon:'🏠', name:'Квартира в центре', desc:'Просторная квартира рядом со всем важным. Гостей приятно приглашать.',
+    eff:'👑 +25 статуса', cost:50000, fx:s=>{s.status+=25;} },
+  { id:'car',   icon:'🚗', name:'Бэха/Мэрс', desc:'Престижная машина. Первое впечатление складывается ещё до того, как ты вышел из неё.',
+    eff:'👑 +15 статуса', cost:40000, fx:s=>{s.status+=15;} },
+  { id:'watch', icon:'⌚', name:'Часы', desc:'Дорогие часы на запястье. Мелочь, которую замечают сразу.',
+    eff:'👑 +5 статуса', cost:15000, fx:s=>{s.status+=5;} },
+  { id:'penthouse', icon:'🏙️', name:'Пентхаус', desc:'Квартира на верхнем этаже с видом на весь город. Вершина статуса.',
+    eff:'👑 +60 статуса', cost:300000, fx:s=>{s.status+=60;} },
+  { id:'charity', icon:'🎗️', name:'Благотворительность', desc:'Пожертвование в фонд. Не про выгоду, а про репутацию и уважение.',
+    eff:'👑 +4 статуса · ✨ +10 ауры', cost:5000, fx:s=>{s.status+=4; s.aura+=10;} },
 ];
 
 // ---------- Toast ----------
@@ -267,6 +375,14 @@ function renderStats(){
   document.getElementById('bAura').style.width = Math.min(100, S.aura)+'%';
   document.getElementById('bEnergy').style.width = Math.min(100, S.energy)+'%';
   document.getElementById('pName').textContent = playerName;
+  // верхняя панель
+  document.getElementById('tbName').textContent = playerName;
+  const tbT = document.getElementById('tbTier');
+  tbT.textContent = `${t.e} ${t.n}`; tbT.style.background = t.bg; tbT.style.color = t.c;
+  document.getElementById('tbStatus').textContent = `👑 ${Math.round(S.status)}`;
+  document.getElementById('tbMoney').textContent = `💰 ${fmt(S.money)}`;
+  document.getElementById('tbEnergy').textContent = `⚡ ${Math.round(S.energy)}`;
+  document.getElementById('tbAva').style.borderColor = t.c;
   const tier = document.getElementById('pTier');
   tier.textContent = `${t.e} ${t.n}`;
   tier.style.background = t.bg; tier.style.color = t.c;
@@ -278,6 +394,11 @@ function renderStats(){
 }
 // Визуализация персонажа: SVG-фэйс, челюсть и причёска зависят от тира
 function renderAvatar(t){
+  const svg = avatarSVG(t);
+  document.getElementById('avatar').innerHTML = svg;
+  document.getElementById('tbAva').innerHTML = svg;
+}
+function avatarSVG(t){
   const l = S.looks;
   const jawY = 78 - Math.min(14, Math.max(0,(l-3))*2); // чем выше лукс, тем резче челюсть
   const jawX = 26 + Math.min(6,(l-3));
@@ -287,7 +408,7 @@ function renderAvatar(t){
     : `<path d="M18 40 Q20 16 48 16 Q76 16 78 40 L74 30 Q70 20 48 20 Q26 20 22 30 Z" fill="${hair}"/>
        <path d="M22 26 L26 20 M30 22 L33 17 M40 19 L41 14 M56 19 L55 14 M66 22 L63 17 M74 26 L70 20" stroke="${hair}" stroke-width="3" stroke-linecap="round"/>`;
   const brow = l<6 ? '#2a1a1a' : '#111';
-  const svg = `<svg viewBox="0 0 96 96" width="96" height="96">
+  return `<svg viewBox="0 0 96 96" width="100%" height="100%">
     <rect width="96" height="96" fill="${t.bg}"/>
     <ellipse cx="48" cy="52" rx="30" ry="34" fill="#e8b88a"/>
     <path d="M${48-jawX} 60 L${48-jawX+3} ${jawY} Q48 ${jawY+7} ${48+jawX-3} ${jawY} L${48+jawX} 60 Z" fill="#e8b88a"/>
@@ -304,9 +425,16 @@ function renderAvatar(t){
       : `<path d="M40 69 Q48 ${l>=8?78:75} 56 69 Z" fill="#fff" stroke="#a06a4a" stroke-width="1.5"/>`}
     ${l>=8?`<rect x="33" y="40" width="14" height="1.4" fill="#fff" opacity=".7"/><rect x="51" y="40" width="14" height="1.4" fill="#fff" opacity=".7"/>`:''}
   </svg>`;
-  document.getElementById('avatar').innerHTML = svg;
 }
 
+function costText(item, isBiz){
+  const parts = [];
+  if (item.cost) parts.push(`💰 ${fmt(item.cost)}`);
+  const e = item.energy || 0;
+  if (e > 0) parts.push(`⚡${e}`);
+  if (e < 0) parts.push(`⚡ +${-e}`);
+  return parts.join(' | ') || 'Бесплатно';
+}
 function renderCards(list, containerId, ownedIds, isBiz){
   const c = document.getElementById(containerId);
   c.innerHTML = '';
@@ -314,30 +442,38 @@ function renderCards(list, containerId, ownedIds, isBiz){
     const owned = ownedIds?.includes(item.id);
     const div = document.createElement('div');
     div.className = 'card' + (owned ? ' locked' : '');
-    const costTxt = isBiz ? `💰 ${fmt(item.cost)} | +${fmt(item.income)}/тик`
-      : item.income ? `💰 ${fmt(item.cost)}`
-      : (item.cost ? `💰 ${fmt(item.cost)} | ⚡${Math.max(0,item.energy)}` : `⚡${Math.max(0,item.energy)}`);
-    div.innerHTML = `<div class="icon">${item.icon}</div><div class="name">${item.name}</div><div class="desc">${item.desc}</div><div class="cost">${owned ? '✅ Куплено' : costTxt}</div>`;
+    const eff = isBiz ? `💰 +${fmt(item.income)}₽ за тик · 👑 +2 статуса` : (item.eff || '');
+    div.innerHTML = `<div class="icon">${item.icon}</div><div class="name">${item.name}</div>`
+      + `<div class="desc">${item.desc || ''}</div>`
+      + (eff ? `<div class="eff">${eff}</div>` : '')
+      + `<div class="cost">${owned ? '✅ Куплено' : costText(item, isBiz)}</div>`;
     if (!owned) div.onclick = () => doAction(item, isBiz);
     c.appendChild(div);
   });
 }
+function renderLists(){
+  renderCards(TRAIN, 'trainGrid');
+  renderCards(BIZ, 'bizGrid', S.biz, true);
+  renderCards(GRIND, 'grindGrid');
+  renderCards(ESTATE, 'estateGrid', S.estate);
+}
 
 function doAction(item, isBiz){
   if (item.req && !item.req(S)) { toast('❌ Нужен лукс 6+ для этого'); return; }
-  if (S.energy < Math.max(0,item.energy)) { toast('😮‍💨 Нет энергии. Поспи.'); return; }
+  const need = Math.max(0, item.energy || 0);
+  const restore = Math.max(0, -(item.energy || 0));
+  if (S.energy < need) { toast('😮‍💨 Нет энергии. Поспи.'); return; }
   if (S.money < item.cost) { toast('💸 Не хватает денег'); return; }
   S.money -= item.cost;
-  S.energy -= Math.max(0, item.energy);
+  S.energy = Math.min(100, S.energy - need + restore);
   let msg = '';
   if (isBiz) { S.biz.push(item.id); S.status += 2; msg = `✅ Открыл: ${item.name}`; }
-  else if (item.income) { /* не бывает */ }
   else if (item.fx) {
     msg = item.fx(S) || `${item.icon} ${item.name}: сделано`;
     if (ESTATE.some(e => e.id === item.id)) S.estate.push(item.id);
   }
   if (msg) toast(msg);
-  renderStats(); save();
+  renderStats(); renderLists(); save();
 }
 
 // ---------- MOG BATTLES ----------
@@ -402,27 +538,201 @@ function battle(i){
 }
 document.getElementById('rerollBtn').onclick = () => { genOpps(); save(); renderBattle(); toast('🔄 Новые луксмаксеры'); };
 
-// ---------- Отношения ----------
-function renderRel(){
-  const el = document.getElementById('relInfo');
-  if (S.rel) { el.innerHTML = `❤️ Встречаешься с <b>${S.rel.name}</b> (${S.rel.looks} лукс)<br><span style="font-size:12px;color:#9a9ab0">Роман в разгаре. Качай дальше.</span>`; return; }
-  el.textContent = 'Свободен. Жми mog и проверяй, потянет ли.';
+// ---------- Отношения (как в приложении знакомств) ----------
+const G_NAMES = ['Алина','Мия','Соня','Кира','Вера','Ника','Ляйсан','Айгуль','Даша','Марго','Полина','Ева','Лена','Яна','Диана','Влада'];
+const G_STATUSES = [
+  { t:'💔 Недавно рассталась',      m:0.85, bio:'Устала от токсичных отношений. Хочу спокойствия и нормального общения.' },
+  { t:'🔥 Ищет серьёзное',          m:1.0,  bio:'Ценю заботу и честность. Без игр и переписок на месяц.' },
+  { t:'😏 Выбирает только Чадов',   m:1.2,  bio:'Низкий лукс даже не рассматриваю. Простите.' },
+  { t:'🎓 Студентка',               m:1.0,  bio:'Учусь, гуляю по городу и иногда пишу первой.' },
+  { t:'💼 Карьеристка',             m:1.1,  bio:'Времени мало. Нужен тот, кто не отстаёт и умеет поддержать.' },
+  { t:'🌙 Просто общается',         m:0.95, bio:'Давай сначала познакомимся, а там посмотрим.' },
+  { t:'🏋️ Фитоняшка',               m:1.05, bio:'Тренировки по утрам, кофе по вечерам. Ищу напарника для зала.' },
+];
+const G_REJECT = ['Прости... ты слишком саб','Не мой тип, извини','Мы не совпали','Ты пока не дотягиваешь','Поищи кого-нибудь попроще'];
+const G_SKIN = ['#f6d5bd','#eac09a','#d9a67a','#c28b61'];
+const G_HAIR = ['#1a1210','#4a2c1a','#8a5a2b','#c9a24a','#b0402a','#2a2a3a'];
+const G_BG   = ['#3a1f3a','#1f2f4a','#2f3a24','#4a2a2a','#1f3a3a','#3a2f4a'];
+const G_TOP  = ['#ff5c8a','#6bd6ff','#a06bff','#ffd166','#2a2a3a','#7dffa8'];
+const G_EYES = ['#3a2a1a','#2a5a8a','#3a6a3a','#5a3a2a'];
+const G_LIPS = ['#d9667a','#c0485e','#e08a8a','#a8384e'];
+
+function genTraits(){
+  return { skin:pick(G_SKIN), hair:pick(G_HAIR), hstyle:Math.floor(Math.random()*3), bg:pick(G_BG),
+           top:pick(G_TOP), eyes:pick(G_EYES), lips:pick(G_LIPS) };
 }
-document.getElementById('shootShot').onclick = () => {
-  const names = ['Алина','Мия','Соня','Кира','Вера','Ника','Ляйсан','Айгуль','Даша','Марго'];
-  const name = names[Math.floor(Math.random()*names.length)];
-  const crushLooks = +(2 + Math.random()*7).toFixed(1);
-  const myScore = S.looks*1.5 + S.status*0.2 + S.iq*0.05 + S.aura*0.1;
-  const herBar = crushLooks*1.8;
-  if (myScore >= herBar) {
-    S.rel = { name, looks: crushLooks };
-    S.aura += 5;
-    toast(`❤️ ${name} сказала ДА! Она на ${crushLooks} лукс. +5 ауры`);
+function genGirl(){
+  const st = pick(G_STATUSES);
+  return Object.assign({ id:Math.random().toString(36).slice(2), name:pick(G_NAMES), age:20+Math.floor(Math.random()*9),
+    looks:+(2 + Math.random()*7).toFixed(1), status:st.t, mod:st.m, bio:st.bio }, genTraits());
+}
+function ensureGirl(g){
+  if (g.skin === undefined) Object.assign(g, genTraits());
+  if (!g.age) g.age = 22;
+  if (!g.status) g.status = '💞 В отношениях';
+  return g;
+}
+// Визуализация девушки (SVG): причёска, цвет кожи, глаза и губы зависят от анкеты
+function girlSVG(g){
+  ensureGirl(g);
+  const back = g.hstyle===0
+    ? `<path d="M24 62 Q20 18 60 16 Q100 18 96 62 L102 132 Q60 142 18 132 Z" fill="${g.hair}"/>`
+    : g.hstyle===1
+    ? `<path d="M26 60 Q26 20 60 18 Q94 20 94 60 L92 96 Q60 106 28 96 Z" fill="${g.hair}"/>`
+    : `<circle cx="60" cy="16" r="12" fill="${g.hair}"/><path d="M30 58 Q30 22 60 20 Q90 22 90 58 Z" fill="${g.hair}"/>`;
+  return `<svg viewBox="0 0 120 130" width="100%" height="100%" preserveAspectRatio="xMidYMin slice">
+    <rect width="120" height="130" fill="${g.bg}"/>
+    ${back}
+    <path d="M14 150 Q20 110 60 106 Q100 110 106 150 Z" fill="${g.top}"/>
+    <rect x="52" y="84" width="16" height="26" fill="${g.skin}"/>
+    <path d="M52 100 Q60 108 68 100 L68 108 Q60 114 52 108 Z" fill="#00000022"/>
+    <ellipse cx="60" cy="64" rx="26" ry="30" fill="${g.skin}"/>
+    <path d="M33 58 Q38 30 60 30 Q82 30 87 58 Q76 42 60 44 Q44 42 33 58 Z" fill="${g.hair}"/>
+    <ellipse cx="49" cy="66" rx="5" ry="3.2" fill="#fff"/><ellipse cx="71" cy="66" rx="5" ry="3.2" fill="#fff"/>
+    <circle cx="49" cy="66" r="2.5" fill="${g.eyes}"/><circle cx="71" cy="66" r="2.5" fill="${g.eyes}"/>
+    <circle cx="49" cy="66" r="1.1" fill="#111"/><circle cx="71" cy="66" r="1.1" fill="#111"/>
+    <path d="M43 63 Q49 59 55 63 M65 63 Q71 59 77 63" stroke="#111" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M44 57 Q49 54 54 57 M66 57 Q71 54 76 57" stroke="${g.hair}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M60 70 Q58 76 61 77" stroke="#00000033" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path d="M52 83 Q60 89 68 83 Q60 81 52 83 Z" fill="${g.lips}"/>
+    <circle cx="43" cy="76" r="5" fill="#ff7a9a" opacity=".22"/><circle cx="77" cy="76" r="5" fill="#ff7a9a" opacity=".22"/>
+  </svg>`;
+}
+
+let relTab = 'deck', swiping = false;
+
+function renderRel(){
+  // верхняя плашка: с кем встречаешься
+  const bar = document.getElementById('relBar');
+  if (S.rel) {
+    ensureGirl(S.rel);
+    bar.innerHTML = `<div class="rb-ava">${girlSVG(S.rel)}</div>
+      <div class="rb-txt"><div class="rb-t">💞 В отношениях</div><div class="rb-n">${S.rel.name}, ${S.rel.age}</div>
+      <div class="rb-s">🔥 ${(+S.rel.looks).toFixed(1)} лукс</div></div>
+      <button class="rb-btn" id="breakBtn">💔 Расстаться</button>`;
+    document.getElementById('breakBtn').onclick = breakUp;
   } else {
-    toast(`💔 ${name} (${crushLooks} лукс): «Прости... ты слишком саб»`);
+    bar.innerHTML = `<div class="rb-txt"><div class="rb-t">Статус</div><div class="rb-n">Свободен</div>
+      <div class="rb-s">Свайпай анкеты и ищи пару</div></div>`;
   }
-  renderStats(); renderRel(); save();
-};
+  document.getElementById('rtMatches').textContent = `💞 Мэтчи${S.matches.length ? ' (' + S.matches.length + ')' : ''}`;
+  document.querySelectorAll('.rtab').forEach(b => b.classList.toggle('active', b.dataset.rt === relTab));
+  document.getElementById('relDeck').classList.toggle('hidden', relTab !== 'deck');
+  document.getElementById('relMatches').classList.toggle('hidden', relTab !== 'matches');
+  if (relTab === 'deck') renderDeck(); else renderMatches();
+}
+document.querySelectorAll('.rtab').forEach(b => b.onclick = () => { relTab = b.dataset.rt; renderRel(); });
+
+function gcard(g, cls){
+  const top = cls === 'top';
+  return `<div class="gcard ${cls}" ${top ? 'id="topCard"' : ''}>
+    <div class="gpic">${girlSVG(g)}</div>
+    ${top ? '<div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div>' : ''}
+    <div class="ginfo">
+      <div class="gname">${g.name}, ${g.age}</div>
+      <div class="gchips"><span class="chip st">${g.status}</span><span class="chip lk">🔥 ${(+g.looks).toFixed(1)}</span></div>
+      <div class="gbio">${g.bio || ''}</div>
+    </div></div>`;
+}
+function renderDeck(){
+  if (!Array.isArray(S.girls)) S.girls = [];
+  while (S.girls.length < 4) S.girls.push(genGirl());
+  const el = document.getElementById('relDeck');
+  el.innerHTML = `<div class="swipe-area">${gcard(S.girls[1], 'behind')}${gcard(S.girls[0], 'top')}</div>
+    <div class="swipe-btns">
+      <button class="rbtn nope" id="btnNope">✖</button>
+      <button class="rbtn like" id="btnLike">❤️</button>
+    </div>
+    <div class="swipe-hint">Свайп вправо или ❤️ — лайк (⚡10). Свайп влево или ✖ — пропустить.</div>`;
+  document.getElementById('btnNope').onclick = () => swipe(false);
+  document.getElementById('btnLike').onclick = () => swipe(true);
+  attachSwipe(document.getElementById('topCard'));
+  save();
+}
+function resetCard(card){
+  card.style.transition = 'transform .2s';
+  card.style.transform = '';
+  card.querySelectorAll('.stamp').forEach(x => x.style.opacity = 0);
+}
+function attachSwipe(card){
+  let sx = 0, dx = 0, drag = false;
+  const like = card.querySelector('.stamp.like'), nope = card.querySelector('.stamp.nope');
+  card.addEventListener('pointerdown', e => { if (swiping) return; drag = true; sx = e.clientX; dx = 0;
+    card.setPointerCapture(e.pointerId); card.style.transition = 'none'; });
+  card.addEventListener('pointermove', e => {
+    if (!drag) return;
+    dx = e.clientX - sx;
+    card.style.transform = `translateX(${dx}px) rotate(${dx/18}deg)`;
+    like.style.opacity = Math.max(0, Math.min(1, dx/90));
+    nope.style.opacity = Math.max(0, Math.min(1, -dx/90));
+  });
+  const end = () => {
+    if (!drag) return; drag = false;
+    if (dx > 90) swipe(true); else if (dx < -90) swipe(false); else resetCard(card);
+    dx = 0;
+  };
+  card.addEventListener('pointerup', end);
+  card.addEventListener('pointercancel', end);
+}
+function swipe(isLike){
+  const card = document.getElementById('topCard');
+  if (!card || swiping) return;
+  if (isLike && S.energy < 10) { toast('😮‍💨 Нет энергии на лайк. Поспи.'); resetCard(card); return; }
+  swiping = true;
+  card.style.transition = 'transform .25s, opacity .25s';
+  card.style.transform = `translateX(${isLike ? 500 : -500}px) rotate(${isLike ? 25 : -25}deg)`;
+  card.style.opacity = 0;
+  setTimeout(() => resolveSwipe(isLike), 240);
+}
+function resolveSwipe(isLike){
+  const g = S.girls.shift();
+  if (isLike) {
+    S.energy = Math.max(0, S.energy - 10);
+    const mine = S.looks*1.5 + S.status*0.2 + S.iq*0.05 + S.aura*0.1 + (Math.random()*3 - 1.5);
+    const bar = g.looks * 1.8 * (g.mod || 1);
+    if (mine >= bar) {
+      S.matches.push(g); S.aura += 2;
+      toast(`💞 Мэтч с ${g.name}! Она на ${(+g.looks).toFixed(1)} лукс. +2 ауры`);
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    } else {
+      toast(`💔 ${g.name}: «${pick(G_REJECT)}»`);
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+    }
+  }
+  swiping = false;
+  save(); renderStats(); renderRel();
+}
+function renderMatches(){
+  const el = document.getElementById('relMatches');
+  if (!S.matches.length) {
+    el.innerHTML = `<div class="empty-note">Пока нет мэтчей.<br>Лайкай анкеты — если ты ей понравишься, она появится здесь.</div>`;
+    return;
+  }
+  el.innerHTML = '';
+  S.matches.forEach(g => {
+    const div = document.createElement('div');
+    div.className = 'match';
+    div.innerHTML = `<div class="m-ava">${girlSVG(g)}</div>
+      <div class="m-body"><div class="m-name">${g.name}, ${g.age}</div>
+        <div class="gchips"><span class="chip st">${g.status}</span><span class="chip lk">🔥 ${(+g.looks).toFixed(1)}</span></div>
+        <div class="m-btns"><button class="m-go">💘 Встречаться</button><button class="m-del">✖</button></div></div>`;
+    div.querySelector('.m-go').onclick = () => startDating(g);
+    div.querySelector('.m-del').onclick = () => { S.matches = S.matches.filter(x => x.id !== g.id); save(); renderRel(); };
+    el.appendChild(div);
+  });
+}
+function startDating(g){
+  if (S.rel) { toast(`Сначала расстанься с ${S.rel.name}`); return; }
+  S.rel = g; S.matches = S.matches.filter(x => x.id !== g.id); S.aura += 5;
+  toast(`💘 Теперь вы с ${g.name}! +5 ауры`);
+  save(); renderStats(); renderRel();
+}
+function breakUp(){
+  if (!S.rel || !confirm(`Расстаться с ${S.rel.name}?`)) return;
+  S.rel = null; S.aura = Math.max(0, S.aura - 3);
+  toast('💔 Вы расстались. −3 ауры');
+  save(); renderStats(); renderRel();
+}
 
 // ---------- Ежедневный подарок ----------
 function todayStr(){ return new Date().toDateString(); }
@@ -469,15 +779,16 @@ document.querySelectorAll('.navitem').forEach(t => {
     const sec = document.getElementById(t.dataset.tab);
     sec.classList.remove('hidden');
     if (t.dataset.tab === 'battle') renderBattle();
+    if (t.dataset.tab === 'rel') renderRel();
   };
 });
+// Профиль открывается по нажатию на аватарку
+document.getElementById('tbAva').onclick = () => { renderStats(); document.getElementById('profile').classList.remove('hidden'); };
+document.getElementById('profClose').onclick = () => document.getElementById('profile').classList.add('hidden');
 
 function renderAll(){
   renderStats();
-  renderCards(TRAIN, 'trainGrid');
-  renderCards(BIZ, 'bizGrid', S.biz, true);
-  renderCards(GRIND, 'grindGrid');
-  renderCards(ESTATE, 'estateGrid', S.estate);
+  renderLists();
   renderRel();
 }
 renderAll();
