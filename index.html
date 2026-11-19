@@ -3,31 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>LOOKSMAX RPG</title>
+<title>Mog Life</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body {
     font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
     background:#0d0d12; color:#e8e8f0; min-height:100vh;
-    padding:16px; max-width:480px; margin:0 auto;
+    padding:16px 16px 90px; max-width:480px; margin:0 auto;
   }
-  h1 { font-size:22px; text-align:center; margin-bottom:4px;
+  h1 { font-size:22px; text-align:center; margin-bottom:14px;
        background:linear-gradient(90deg,#ff5c8a,#a06bff);
        -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .sub { text-align:center; color:#888; font-size:12px; margin-bottom:14px; }
-  .stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
-  .stat { background:#1a1a24; border-radius:12px; padding:10px 12px; }
-  .stat .label { font-size:11px; color:#9a9ab0; }
-  .stat .value { font-size:20px; font-weight:700; }
-  .bar { height:6px; background:#2a2a3a; border-radius:3px; margin-top:6px; overflow:hidden; }
-  .bar > div { height:100%; border-radius:3px; transition:width .4s; }
-  .money { color:#ffd166; } .looks { color:#ff5c8a; } .iq { color:#6bd6ff; } .status { color:#a06bff; }
-  .energy { display:flex; align-items:center; gap:8px; margin-bottom:14px;
-            background:#1a1a24; border-radius:12px; padding:8px 12px; }
-  .energy .bar { flex:1; margin:0; height:10px; }
-  .section { margin-bottom:16px; }
-  .section h2 { font-size:14px; color:#9a9ab0; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+  .money { color:#ffd166; } .looks { color:#ff5c8a; } .iq { color:#6bd6ff; }
+  .status { color:#a06bff; } .aura { color:#7dffa8; }
+  .hidden { display:none; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .card {
     background:#1a1a24; border:1px solid #2a2a3a; border-radius:14px;
@@ -39,213 +29,459 @@
   .card .name { font-size:13px; font-weight:600; margin:6px 0 2px; }
   .card .desc { font-size:11px; color:#9a9ab0; line-height:1.35; }
   .card .cost { font-size:11px; color:#ffd166; margin-top:6px; }
-  .log { background:#14141c; border-radius:12px; padding:10px; font-size:12px;
-         color:#b8b8cc; height:110px; overflow-y:auto; line-height:1.5; }
-  .log p { margin-bottom:4px; }
-  .log .bad { color:#ff7b7b; } .log .good { color:#7dffa8; }
-  .hidden { display:none; }
-  /* Bottom navigation */
-  .bottomnav {
-    position:fixed; bottom:0; left:0; right:0; z-index:100;
-    background:#14141ccc; backdrop-filter:blur(12px);
-    border-top:1px solid #2a2a3a;
-    display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom));
-  }
-  .navitem {
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
-    padding:6px 0; border-radius:12px; cursor:pointer; color:#9a9ab0;
-    font-size:10px; border:none; background:none; transition:color .2s;
-  }
-  .navitem .ic { font-size:20px; }
-  .navitem.active { color:#fff; }
-  .navitem.active .ic { transform:translateY(-1px); }
-  body { padding-bottom:76px; }
   .btn-big {
     width:100%; padding:14px; border:none; border-radius:14px; font-size:15px; font-weight:700;
     background:linear-gradient(90deg,#ff5c8a,#a06bff); color:#fff; cursor:pointer; margin-top:6px;
   }
+  .btn-ghost {
+    width:100%; padding:11px; border:1px solid #3a3a4a; border-radius:14px; font-size:13px;
+    background:#1a1a24; color:#b8b8cc; cursor:pointer; margin-top:8px;
+  }
+  .section h2 { font-size:14px; color:#9a9ab0; margin:4px 0 10px; text-transform:uppercase; letter-spacing:1px; }
+
+  /* ---- Profile ---- */
+  .profile-top { display:flex; gap:14px; align-items:center; margin-bottom:16px; }
+  .avatar-wrap { position:relative; width:96px; height:96px; flex-shrink:0; }
+  .avatar-ring { position:absolute; inset:-5px; border-radius:32px; }
+  .p-name { font-size:19px; font-weight:800; }
+  .p-tier { display:inline-block; margin-top:6px; padding:4px 12px; border-radius:20px;
+            font-size:12px; font-weight:700; }
+  .p-tier-sub { font-size:11px; color:#9a9ab0; margin-top:6px; line-height:1.4; }
+  .stats-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .srow { display:flex; align-items:center; gap:10px; background:#1a1a24;
+          border-radius:12px; padding:10px 14px; }
+  .srow .sl { font-size:12px; color:#9a9ab0; width:120px; }
+  .srow .sv { font-size:16px; font-weight:700; flex:1; }
+  .srow .bar { flex:2; height:8px; background:#2a2a3a; border-radius:4px; overflow:hidden; }
+  .srow .bar > div { height:100%; border-radius:4px; transition:width .4s; }
+  .daily {
+    background:linear-gradient(135deg,#241a2e,#1a1a24); border:1px solid #3a2a4a;
+    border-radius:16px; padding:14px; text-align:center;
+  }
+  .daily .d-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .daily .d-desc { font-size:11px; color:#9a9ab0; margin-bottom:10px; }
+
+  /* ---- Battle ---- */
+  .opp {
+    background:#1a1a24; border:1px solid #2a2a3a; border-radius:16px;
+    padding:14px; margin-bottom:10px;
+  }
+  .opp-head { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .opp-ava { width:52px; height:52px; border-radius:16px; display:flex; align-items:center;
+             justify-content:center; font-size:26px; background:#2a2a3a; flex-shrink:0; }
+  .opp-name { font-size:15px; font-weight:700; }
+  .opp-tier { font-size:11px; color:#9a9ab0; }
+  .opp-stats { display:flex; gap:14px; font-size:12px; color:#b8b8cc; margin-bottom:10px; }
+  .opp .btn-battle {
+    width:100%; padding:10px; border:none; border-radius:10px; font-weight:700; font-size:13px;
+    background:linear-gradient(90deg,#ff5c8a,#ff8a5c); color:#fff; cursor:pointer;
+  }
+  .timer-note { text-align:center; font-size:11px; color:#9a9ab0; margin-top:4px; }
+
+  /* ---- Toast ---- */
+  .toast {
+    position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-80px);
+    background:#24243a; border:1px solid #3a3a5a; padding:10px 18px; border-radius:14px;
+    font-size:13px; z-index:200; transition:transform .3s; max-width:90%; text-align:center;
+    box-shadow:0 8px 30px #000a;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* ---- Bottom nav ---- */
+  .bottomnav {
+    position:fixed; bottom:0; left:0; right:0; z-index:100;
+    background:#14141ccc; backdrop-filter:blur(12px);
+    border-top:1px solid #2a2a3a;
+    display:flex; padding:4px 2px calc(4px + env(safe-area-inset-bottom));
+  }
+  .navitem {
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:1px;
+    padding:5px 0; border-radius:10px; cursor:pointer; color:#9a9ab0;
+    font-size:9px; border:none; background:none;
+  }
+  .navitem .ic { font-size:19px; }
+  .navitem.active { color:#fff; }
 </style>
 </head>
 <body>
-<h1>LOOKSMAX RPG</h1>
-<div class="sub">Саб-3 → Гигачад. Не откисай.</div>
+<h1>Mog Life</h1>
 
-<div class="stats">
-  <div class="stat"><div class="label">💰 Деньги</div><div class="value money" id="money">0</div></div>
-  <div class="stat"><div class="label">🔥 Лукс</div><div class="value looks" id="looks">3.0</div><div class="bar"><div id="looksBar" style="width:30%;background:#ff5c8a"></div></div></div>
-  <div class="stat"><div class="label">🧠 Интеллект</div><div class="value iq" id="iq">70</div><div class="bar"><div id="iqBar" style="width:70%;background:#6bd6ff"></div></div></div>
-  <div class="stat"><div class="label">👑 Статус</div><div class="value status" id="status">0</div></div>
-</div>
-<div class="energy">⚡<div class="bar"><div id="energyBar" style="width:100%;background:#7dffa8"></div></div><span id="energyTxt" style="font-size:12px">100/100</span></div>
-
-
+<!-- ПРОКАЧКА -->
 <div id="train" class="section">
   <div class="grid" id="trainGrid"></div>
 </div>
 
-<div id="career" class="section hidden">
+<!-- ЗАРАБОТОК -->
+<div id="biz" class="section hidden">
+  <h2>Пассивный доход</h2>
   <div class="grid" id="bizGrid"></div>
+  <h2 style="margin-top:16px">Активный заработок</h2>
+  <div class="grid" id="grindGrid"></div>
 </div>
 
-<div id="life" class="section hidden">
-  <div class="grid" id="lifeGrid"></div>
+<!-- MOG БАТЛЫ -->
+<div id="battle" class="section hidden">
+  <h2>⚔️ Mog Battle</h2>
+  <div id="oppList"></div>
+  <button class="btn-ghost" id="rerollBtn">🔄 Заменить луксмаксеров</button>
+  <div class="timer-note" id="timerNote"></div>
+</div>
+
+<!-- НЕДВИЖИМОСТЬ -->
+<div id="estate" class="section hidden">
+  <div class="grid" id="estateGrid"></div>
+</div>
+
+<!-- ОТНОШЕНИЯ -->
+<div id="rel" class="section hidden">
   <button class="btn-big" id="shootShot">mog</button>
-  <div id="relInfo" style="margin-top:10px;font-size:13px;text-align:center;color:#b8b8cc"></div>
+  <div id="relInfo" style="margin-top:12px;font-size:14px;text-align:center;color:#b8b8cc;line-height:1.6"></div>
 </div>
 
-<div class="section">
-  <h2>📋 Лог</h2>
-  <div class="log" id="log"></div>
+<!-- ПРОФИЛЬ -->
+<div id="profile" class="section hidden">
+  <div class="profile-top">
+    <div class="avatar-wrap">
+      <div class="avatar-ring" id="avaRing"></div>
+      <div id="avatar" style="width:96px;height:96px;border-radius:26px;overflow:hidden;background:#2a2a3a"></div>
+    </div>
+    <div>
+      <div class="p-name" id="pName">Ты</div>
+      <span class="p-tier" id="pTier"></span>
+      <div class="p-tier-sub" id="pTierSub"></div>
+    </div>
+  </div>
+  <div class="stats-list">
+    <div class="srow"><span class="sl">💰 Деньги</span><span class="sv money" id="sMoney">0</span></div>
+    <div class="srow"><span class="sl">🔥 Лукс</span><span class="sv looks" id="sLooks">3.0</span><div class="bar"><div id="bLooks" style="width:30%;background:#ff5c8a"></div></div></div>
+    <div class="srow"><span class="sl">🧠 IQ</span><span class="sv iq" id="sIq">70</span><div class="bar"><div id="bIq" style="width:70%;background:#6bd6ff"></div></div></div>
+    <div class="srow"><span class="sl">👑 Статус</span><span class="sv status" id="sStatus">0</span><div class="bar"><div id="bStatus" style="background:#a06bff"></div></div></div>
+    <div class="srow"><span class="sl">✨ Аура</span><span class="sv aura" id="sAura">0</span><div class="bar"><div id="bAura" style="background:#7dffa8"></div></div></div>
+    <div class="srow"><span class="sl">⚡ Энергия</span><span class="sv" id="sEnergy" style="color:#7dffa8">100</span><div class="bar"><div id="bEnergy" style="background:#7dffa8"></div></div></div>
+  </div>
+  <div class="daily">
+    <div class="d-title">🎁 Ежедневный подарок</div>
+    <div class="d-desc" id="dailyDesc"></div>
+    <button class="btn-big" id="dailyBtn">Забрать</button>
+  </div>
+  <button class="btn-ghost" id="resetBtn" style="margin-top:16px;color:#ff7b7b">Сбросить прогресс</button>
 </div>
 
 <nav class="bottomnav">
-  <button class="navitem active" data-tab="train"><span class="ic">🏋️</span>Прокачка</button>
-  <button class="navitem" data-tab="career"><span class="ic">💼</span>Бизнес</button>
-  <button class="navitem" data-tab="life"><span class="ic">😏</span>mog</button>
+  <button class="navitem active" data-tab="train"><span class="ic">🏋️</span>Качалка</button>
+  <button class="navitem" data-tab="biz"><span class="ic">💼</span>Заработок</button>
+  <button class="navitem" data-tab="battle"><span class="ic">⚔️</span>Mog</button>
+  <button class="navitem" data-tab="estate"><span class="ic">🏠</span>Недвижка</button>
+  <button class="navitem" data-tab="rel"><span class="ic">❤️</span>Отношения</button>
+  <button class="navitem" data-tab="profile"><span class="ic">👤</span>Профиль</button>
 </nav>
 
+<div class="toast" id="toast"></div>
+
 <script>
-// ---------- Telegram ----------
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0d0d12'); }
 const playerName = tg?.initDataUnsafe?.user?.first_name || 'Ты';
 
 // ---------- Состояние ----------
-const DEFAULTS = { money: 500, looks: 3.0, iq: 70, status: 0, energy: 100, biz: [], rel: null, log: [] };
+const DEFAULTS = { money:500, looks:3.0, iq:70, status:0, aura:0, energy:100,
+  biz:[], estate:[], rel:null, streak:0, lastDaily:null, opps:null, oppsTime:0 };
 let S = load();
-function load() {
-  try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('looksmax_save'))); }
-  catch(e) { return {...DEFAULTS}; }
-}
-function save() { localStorage.setItem('looksmax_save', JSON.stringify(S)); }
+function load(){ try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('moglife'))); }
+  catch(e){ return {...DEFAULTS}; } }
+function save(){ localStorage.setItem('moglife', JSON.stringify(S)); }
 
-// ---------- Данные действий ----------
+// ---------- Тиры ----------
+function getTier(l){
+  if(l<4)  return {n:'Саб-3', e:'😭', c:'#ff5c5c', bg:'#3a1a1a', d:'Ниже базы. Надо работать. Жёстко.'};
+  if(l<5)  return {n:'LTN', e:'🙁', c:'#ff9a5c', bg:'#3a2a1a', d:'Low-Tier Normie. Уже не саб, но пахнет.'};
+  if(l<6)  return {n:'MTN', e:'😐', c:'#ffd166', bg:'#3a3a1a', d:'Mid-Tier Normie. В толпе не выделяешься.'};
+  if(l<7)  return {n:'HTN', e:'🙂', c:'#a8e05c', bg:'#22301a', d:'High-Tier Normie. Девчонки начинают смотреть.'};
+  if(l<8)  return {n:'Чад Лайт', e:'😎', c:'#5cd6a0', bg:'#1a3028', d:'Chadlite. Могешь почти всех. Почти.'};
+  if(l<9)  return {n:'Чад', e:'😈', c:'#5cb8ff', bg:'#1a2838', d:'Chad. Люди оборачиваются.'};
+  return {n:'Тру Адам', e:'🗿', c:'#c89aff', bg:'#2a1a3a', d:'True Adam. Первый человек. Идеал.'};
+}
+
+// ---------- Данные ----------
 const TRAIN = [
   { id:'gym',   icon:'🏋️', name:'Зал',        desc:'+0.2 лукс, +сила. Дрип не дрип, а качок — важно.', cost:100, energy:20, fx:s=>{s.looks+=0.2; s.status+=1;} },
   { id:'face',  icon:'🧴', name:'Уход за лицом', desc:'+0.15 лукс. Скинкеар-рутина, санскрин каждый день.', cost:150, energy:10, fx:s=>{s.looks+=0.15;} },
-  { id:'hair',  icon:'💇', name:'Причёска',    desc:'+0.3 лукс. Фейд + текстура, только так.', cost:300, energy:5,  fx:s=>{s.looks+=0.3;} },
-  { id:'style', icon:'👕', name:'Одежда',      desc:'+0.4 лукс. Подобранный вайб, а не просто дорого.', cost:800, energy:5,  fx:s=>{s.looks+=0.4;} },
-  { id:'books', icon:'📚', name:'Читать',      desc:'+3 IQ. Книги по переговорам и биохакингу.', cost:50,  energy:15, fx:s=>{s.iq+=3;} },
+  { id:'hair',  icon:'💇', name:'Причёска',    desc:'+0.3 лукс. Фейд + текстура, только так.', cost:300, energy:5, fx:s=>{s.looks+=0.3;} },
+  { id:'style', icon:'👕', name:'Одежда',      desc:'+0.4 лукс. Подобранный вайб, а не просто дорого.', cost:800, energy:5, fx:s=>{s.looks+=0.4;} },
+  { id:'books', icon:'📚', name:'Читать',      desc:'+3 IQ. Книги по переговорам и биохакингу.', cost:50, energy:15, fx:s=>{s.iq+=3;} },
   { id:'course',icon:'🎓', name:'Курсы',       desc:'+8 IQ. Платное обучение, нетворкинг.', cost:1000, energy:25, fx:s=>{s.iq+=8; s.status+=2;} },
-  { id:'jaw',   icon:'🏥', name:'Операция (эстет.)', desc:'+1.0 лукс. Ментoplasty/рино. Больно, но того стоит.', cost:10000, energy:60, fx:s=>{s.looks+=1.0; s.status+=3;} },
-  { id:'sleep', icon:'😴', name:'Восстановиться', desc:'+60 энергии. Сон — главный but способ луксмаксить.', cost:0, energy:-60, fx:s=>{} },
+  { id:'jaw',   icon:'🏥', name:'Операция (эстет.)', desc:'+1.0 лукс. Ментопластика/рино. Больно, но того стоит.', cost:10000, energy:60, fx:s=>{s.looks+=1.0; s.status+=3; s.aura-=5;} },
+  { id:'sleep', icon:'😴', name:'Восстановиться', desc:'+60 энергии. Сон — главный буст.', cost:0, energy:-60, fx:s=>{} },
 ];
 const BIZ = [
-  { id:'dropship', icon:'📦', name:'Дропшиппинг',   cost:2000,  income:80 },
-  { id:'salon',    icon:'💈', name:'Барбершоп',     cost:8000,  income:350 },
-  { id:'gymbiz',   icon:'🏢', name:'Сеть залов',    cost:30000, income:1500 },
-  { id:'brand',    icon:'🚀', name:'Свой бренд',    cost:100000,income:6000 },
+  { id:'dropship', icon:'📦', name:'Дропшиппинг',   cost:2000,   income:80 },
+  { id:'salon',    icon:'💈', name:'Барбершоп',     cost:8000,   income:350 },
+  { id:'gymbiz',   icon:'🏢', name:'Сеть залов',    cost:30000,  income:1500 },
+  { id:'brand',    icon:'🚀', name:'Свой бренд',    cost:100000, income:6000 },
+  { id:'agency',   icon:'📱', name:'SMM-агентство', cost:250000, income:16000 },
 ];
-const LIFE = [
-  { id:'flat', icon:'🏠', name:'Квартира в центре', desc:'+25 статуса', cost:50000, fx:s=>{s.status+=25;} },
-  { id:'car',  icon:'🚗', name:'Бэха/Мэрс', desc:'+15 статуса', cost:40000, fx:s=>{s.status+=15;} },
-  { id:'watch',icon:'⌚', name:'Часы', desc:'+5 статуса', cost:15000, fx:s=>{s.status+=5;} },
-  { id:'charity',icon:'🎗️', name:'Благотворительность', desc:'+4 статуса, +карма', cost:5000, fx:s=>{s.status+=4;} },
+// Активный заработок
+const GRIND = [
+  { id:'tiktok', icon:'🎵', name:'Выложить TikTok', desc:'Дохід зависит от лукса и ауры. Формула: фпс-максинг.', cost:0, energy:15,
+    fx:s=>{ const gain = Math.round(30 + s.looks*60 + s.aura*4 + Math.random()*200); s.money+=gain; s.status+=1;
+      return `TikTok залетел: +${gain}₽`; } },
+  { id:'stream', icon:'🎥', name:'Стрим по луксмаксу', desc:'Рассказываешь про хаирсистемы. Доход = лукс × 90.', cost:0, energy:25,
+    fx:s=>{ const gain = Math.round(s.looks*90 + s.iq*2 + Math.random()*150); s.money+=gain;
+      return `Донаты со стрима: +${gain}₽`; } },
+  { id:'course2', icon:'🎓', name:'Курс по луксмаксингу', desc:'Нужен лукс 6+. Продаёшь мечту сабам.', cost:0, energy:50, req:s=>s.looks>=6,
+    fx:s=>{ const gain = Math.round(1000 + s.looks*300 + s.aura*10); s.money+=gain; s.aura+=2; s.status+=3;
+      return `Сабы скупили курс: +${gain}₽`; } },
+];
+const ESTATE = [
+  { id:'room',  icon:'🏚️', name:'Снять съёмку',  desc:'+2 статуса. Своя берлога.', cost:5000, fx:s=>{s.status+=2;} },
+  { id:'flat',  icon:'🏠', name:'Квартира в центре', desc:'+25 статуса', cost:50000, fx:s=>{s.status+=25;} },
+  { id:'car',   icon:'🚗', name:'Бэха/Мэрс', desc:'+15 статуса', cost:40000, fx:s=>{s.status+=15;} },
+  { id:'watch', icon:'⌚', name:'Часы', desc:'+5 статуса', cost:15000, fx:s=>{s.status+=5;} },
+  { id:'penthouse', icon:'🏙️', name:'Пентхаус', desc:'+60 статуса', cost:300000, fx:s=>{s.status+=60;} },
+  { id:'charity', icon:'🎗️', name:'Благотворительность', desc:'+4 статуса, +10 ауры', cost:5000, fx:s=>{s.status+=4; s.aura+=10;} },
 ];
 
-// ---------- Лог ----------
-function logMsg(msg, cls='') {
-  S.log.unshift({msg, cls, t: Date.now()});
-  S.log = S.log.slice(0, 30);
-  renderLog(); save();
-}
-function renderLog() {
-  document.getElementById('log').innerHTML = S.log
-    .map(l => `<p class="${l.cls}">${l.msg}</p>`).join('');
+// ---------- Toast ----------
+let toastTO;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTO);
+  toastTO = setTimeout(()=>t.classList.remove('show'), 2200);
+  if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 }
 
 // ---------- Рендер ----------
-function fmt(n){ return n>=1e6 ? (n/1e6).toFixed(1)+'M' : n.toLocaleString('ru-RU'); }
-function renderStats() {
-  document.getElementById('money').textContent = fmt(S.money);
-  document.getElementById('looks').textContent = S.looks.toFixed(1);
-  document.getElementById('iq').textContent = Math.round(S.iq);
-  document.getElementById('status').textContent = Math.round(S.status);
-  document.getElementById('looksBar').style.width = Math.min(100, S.looks*10) + '%';
-  document.getElementById('iqBar').style.width = Math.min(100, S.iq) + '%';
-  const e = Math.max(0, Math.min(100, S.energy));
-  document.getElementById('energyBar').style.width = e + '%';
-  document.getElementById('energyTxt').textContent = `${Math.round(e)}/100`;
+function fmt(n){ return n>=1e6 ? (n/1e6).toFixed(1)+'M' : Math.round(n).toLocaleString('ru-RU'); }
+function renderStats(){
+  const t = getTier(S.looks);
+  document.getElementById('sMoney').textContent = fmt(S.money);
+  document.getElementById('sLooks').textContent = S.looks.toFixed(1);
+  document.getElementById('sIq').textContent = Math.round(S.iq);
+  document.getElementById('sStatus').textContent = Math.round(S.status);
+  document.getElementById('sAura').textContent = Math.round(S.aura);
+  document.getElementById('sEnergy').textContent = Math.round(S.energy);
+  document.getElementById('bLooks').style.width = Math.min(100, S.looks*10)+'%';
+  document.getElementById('bIq').style.width = Math.min(100, S.iq)+'%';
+  document.getElementById('bStatus').style.width = Math.min(100, S.status/3)+'%';
+  document.getElementById('bAura').style.width = Math.min(100, S.aura)+'%';
+  document.getElementById('bEnergy').style.width = Math.min(100, S.energy)+'%';
+  document.getElementById('pName').textContent = playerName;
+  const tier = document.getElementById('pTier');
+  tier.textContent = `${t.e} ${t.n}`;
+  tier.style.background = t.bg; tier.style.color = t.c;
+  document.getElementById('pTierSub').textContent = t.d;
+  document.getElementById('avaRing').style.boxShadow = `0 0 24px ${t.c}55`;
+  document.getElementById('avaRing').style.border = `2px solid ${t.c}`;
+  renderAvatar(t);
+  renderDaily();
+}
+// Визуализация персонажа: SVG-фэйс, челюсть и причёска зависят от тира
+function renderAvatar(t){
+  const l = S.looks;
+  const jawY = 78 - Math.min(14, Math.max(0,(l-3))*2); // чем выше лукс, тем резче челюсть
+  const jawX = 26 + Math.min(6,(l-3));
+  const hair = l<5 ? '#3a2a1a' : l<7 ? '#1a1a1a' : '#0d0d0d';
+  const hairStyle = l<6
+    ? `<path d="M20 38 Q24 20 48 20 Q72 20 76 38 L76 30 Q72 14 48 14 Q24 14 20 30 Z" fill="${hair}"/>`
+    : `<path d="M18 40 Q20 16 48 16 Q76 16 78 40 L74 30 Q70 20 48 20 Q26 20 22 30 Z" fill="${hair}"/>
+       <path d="M22 26 L26 20 M30 22 L33 17 M40 19 L41 14 M56 19 L55 14 M66 22 L63 17 M74 26 L70 20" stroke="${hair}" stroke-width="3" stroke-linecap="round"/>`;
+  const brow = l<6 ? '#2a1a1a' : '#111';
+  const svg = `<svg viewBox="0 0 96 96" width="96" height="96">
+    <rect width="96" height="96" fill="${t.bg}"/>
+    <ellipse cx="48" cy="52" rx="30" ry="34" fill="#e8b88a"/>
+    <path d="M${48-jawX} 60 L${48-jawX+3} ${jawY} Q48 ${jawY+7} ${48+jawX-3} ${jawY} L${48+jawX} 60 Z" fill="#e8b88a"/>
+    <path d="M${48-jawX+3} ${jawY} Q48 ${jawY+7} ${48+jawX-3} ${jawY}" stroke="#d9a06a" stroke-width="2" fill="none"/>
+    ${hairStyle}
+    <rect x="30" y="${l<7?46:44}" width="12" height="${l<7?3:4}" rx="1.5" fill="${brow}"/>
+    <rect x="54" y="${l<7?46:44}" width="12" height="${l<7?3:4}" rx="1.5" fill="${brow}"/>
+    <circle cx="36" cy="54" r="2.6" fill="#1a1a1a"/><circle cx="60" cy="54" r="2.6" fill="#1a1a1a"/>
+    <path d="M46 60 Q48 62 50 60" stroke="#c98d5a" stroke-width="1.6" fill="none"/>
+    ${l<5
+      ? `<path d="M40 72 Q48 68 56 72" stroke="#a06a4a" stroke-width="2" fill="none"/>`
+      : l<7
+      ? `<path d="M40 71 Q48 73 56 71" stroke="#a06a4a" stroke-width="2" fill="none"/>`
+      : `<path d="M40 69 Q48 ${l>=8?78:75} 56 69 Z" fill="#fff" stroke="#a06a4a" stroke-width="1.5"/>`}
+    ${l>=8?`<rect x="33" y="40" width="14" height="1.4" fill="#fff" opacity=".7"/><rect x="51" y="40" width="14" height="1.4" fill="#fff" opacity=".7"/>`:''}
+  </svg>`;
+  document.getElementById('avatar').innerHTML = svg;
 }
 
-function renderCards(list, containerId, ownedIds) {
+function renderCards(list, containerId, ownedIds, isBiz){
   const c = document.getElementById(containerId);
   c.innerHTML = '';
   list.forEach(item => {
     const owned = ownedIds?.includes(item.id);
     const div = document.createElement('div');
     div.className = 'card' + (owned ? ' locked' : '');
-    const costTxt = item.income ? `💰 ${fmt(item.cost)} | +${fmt(item.income)}/тик` : (item.cost ? `💰 ${fmt(item.cost)} | ⚡${item.energy}` : '⚡+60');
+    const costTxt = isBiz ? `💰 ${fmt(item.cost)} | +${fmt(item.income)}/тик`
+      : item.income ? `💰 ${fmt(item.cost)}`
+      : (item.cost ? `💰 ${fmt(item.cost)} | ⚡${Math.max(0,item.energy)}` : `⚡${Math.max(0,item.energy)}`);
     div.innerHTML = `<div class="icon">${item.icon}</div><div class="name">${item.name}</div><div class="desc">${item.desc}</div><div class="cost">${owned ? '✅ Куплено' : costTxt}</div>`;
-    if (!owned) div.onclick = () => doAction(item);
+    if (!owned) div.onclick = () => doAction(item, isBiz);
     c.appendChild(div);
   });
 }
 
-function renderAll() {
-  renderStats();
-  renderCards(TRAIN, 'trainGrid');
-  renderCards(BIZ, 'bizGrid', S.biz);
-  renderCards(LIFE, 'lifeGrid');
-  renderRel();
-  renderLog();
-}
-
-// ---------- Действия ----------
-function doAction(item) {
-  if (S.energy < Math.max(0,item.energy)) { logMsg('😮‍💨 Нет энергии. Поспи.', 'bad'); return; }
-  if (S.money < item.cost) { logMsg('💸 Не хватает денег на «' + item.name + '»', 'bad'); return; }
+function doAction(item, isBiz){
+  if (item.req && !item.req(S)) { toast('❌ Нужен лукс 6+ для этого'); return; }
+  if (S.energy < Math.max(0,item.energy)) { toast('😮‍💨 Нет энергии. Поспи.'); return; }
+  if (S.money < item.cost) { toast('💸 Не хватает денег'); return; }
   S.money -= item.cost;
   S.energy -= Math.max(0, item.energy);
-  if (item.income) { S.biz.push(item.id); logMsg(`✅ Открыл бизнес: ${item.name}!`, 'good'); }
-  else if (item.fx) { item.fx(S); logMsg(`${item.icon} ${item.name}: сделано.`, 'good'); }
-  if (item.income) S.status += 2;
-  renderAll(); save();
+  let msg = '';
+  if (isBiz) { S.biz.push(item.id); S.status += 2; msg = `✅ Открыл: ${item.name}`; }
+  else if (item.income) { /* не бывает */ }
+  else if (item.fx) {
+    msg = item.fx(S) || `${item.icon} ${item.name}: сделано`;
+    if (ESTATE.some(e => e.id === item.id)) S.estate.push(item.id);
+  }
+  if (msg) toast(msg);
+  renderStats(); save();
 }
 
-// ---------- Отношения ----------
-function renderRel() {
-  const el = document.getElementById('relInfo');
-  if (S.rel) { el.innerHTML = `❤️ Встречаешься с <b>${S.rel.name}</b> (${S.rel.looks} лукс)`; return; }
-  el.textContent = 'Свободен. Найди кого-то через «Замогать».';
+// ---------- MOG BATTLES ----------
+const OPP_NAMES = ['Gymcel_Гоша','JawlineKing','Chadlite_Дима','Саня_Масса','HTN_Mакс','Квадрочел','Скуллмаксер','Низкий_Стартер','Брейнрот2007','Лукс_Пётр','Мог_Антон','Хейрсистемщик','Фейсинжектор','Мидфейс_Вован'];
+const OPP_EMOJI = ['🗿','😐','😤','💪','🧢','😬','🤨','🏋️','🍔','😴','🤡','🦍'];
+function genOpps(){
+  const arr = [];
+  const used = new Set();
+  for (let i=0;i<3;i++){
+    let ni = Math.floor(Math.random()*OPP_NAMES.length);
+    while(used.has(ni)) ni = Math.floor(Math.random()*OPP_NAMES.length);
+    used.add(ni);
+    const looks = +(Math.max(2, Math.min(9.8, S.looks + (Math.random()*3 - 1.4)))).toFixed(1);
+    arr.push({ name: OPP_NAMES[ni], e: OPP_EMOJI[Math.floor(Math.random()*OPP_EMOJI.length)],
+      looks, status: Math.round(looks*4 + Math.random()*30), aura: Math.round(looks*8 + Math.random()*40) });
+  }
+  S.opps = arr; S.oppsTime = Date.now();
 }
-function shootShot() {
-  const names = ['Алина','Мия','Соня','Кира','Вера','Ника','Ляйсан'];
-  const crushLooks = +(2 + Math.random()*7).toFixed(1);
+function ensureOpps(){ if (!S.opps || Date.now() - S.oppsTime > 5*60*1000) genOpps(); }
+function renderBattle(){
+  ensureOpps();
+  const c = document.getElementById('oppList');
+  c.innerHTML = '';
+  S.opps.forEach((o,i) => {
+    const t = getTier(o.looks);
+    const div = document.createElement('div');
+    div.className = 'opp';
+    div.innerHTML = `
+      <div class="opp-head">
+        <div class="opp-ava">${o.e}</div>
+        <div><div class="opp-name">${o.name}</div><div class="opp-tier">${t.e} ${t.n}</div></div>
+      </div>
+      <div class="opp-stats"><span class="looks">🔥 ${o.looks.toFixed(1)}</span><span class="status">👑 ${o.status}</span><span class="aura">✨ ${o.aura}</span></div>
+      <button class="btn-battle">⚔️ MOG'нуть (⚡20)</button>`;
+    div.querySelector('.btn-battle').onclick = () => battle(i);
+    c.appendChild(div);
+  });
+  const left = Math.max(0, 5*60*1000 - (Date.now() - S.oppsTime));
+  document.getElementById('timerNote').textContent =
+    `Обновление соперников через ${Math.ceil(left/60000)} мин`;
+}
+function power(l, st, au, iq){ return l*10 + st*0.8 + au*0.5 + iq*0.2 + Math.random()*18; }
+function battle(i){
+  if (S.energy < 20) { toast('😮‍💨 Мало энергии для батла'); return; }
+  S.energy -= 20;
+  const o = S.opps[i];
+  const my = power(S.looks, S.status, S.aura, S.iq);
+  const their = power(o.looks, o.status, o.aura, 80);
+  if (my >= their) {
+    const gainM = Math.round(400 + o.looks*250);
+    const gainA = Math.round(10 + o.looks*6);
+    S.money += gainM; S.aura += gainA; S.looks += 0.05; S.status += 2;
+    toast(`😈 Замогал ${o.name}! +${fmt(gainM)}₽, +${gainA} ауры`);
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  } else {
+    S.aura = Math.max(0, S.aura - 8);
+    toast(`💀 ${o.name} замогал ТЕБЯ... -8 ауры`);
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+  }
+  S.opps.splice(i,1);
+  save(); renderStats(); renderBattle();
+}
+document.getElementById('rerollBtn').onclick = () => { genOpps(); save(); renderBattle(); toast('🔄 Новые луксмаксеры'); };
+
+// ---------- Отношения ----------
+function renderRel(){
+  const el = document.getElementById('relInfo');
+  if (S.rel) { el.innerHTML = `❤️ Встречаешься с <b>${S.rel.name}</b> (${S.rel.looks} лукс)<br><span style="font-size:12px;color:#9a9ab0">Роман в разгаре. Качай дальше.</span>`; return; }
+  el.textContent = 'Свободен. Жми mog и проверяй, потянет ли.';
+}
+document.getElementById('shootShot').onclick = () => {
+  const names = ['Алина','Мия','Соня','Кира','Вера','Ника','Ляйсан','Айгуль','Даша','Марго'];
   const name = names[Math.floor(Math.random()*names.length)];
-  const myScore = S.looks*1.5 + S.status*0.2 + S.iq*0.05;
+  const crushLooks = +(2 + Math.random()*7).toFixed(1);
+  const myScore = S.looks*1.5 + S.status*0.2 + S.iq*0.05 + S.aura*0.1;
   const herBar = crushLooks*1.8;
   if (myScore >= herBar) {
     S.rel = { name, looks: crushLooks };
-    logMsg(`❤️ ${name} сказала ДА! Она на ${crushLooks} лукс.`, 'good');
+    S.aura += 5;
+    toast(`❤️ ${name} сказала ДА! Она на ${crushLooks} лукс. +5 ауры`);
   } else {
-    logMsg(`💔 ${name} (${crushLooks} лукс): «Прости, но нет... ты слишком саб»`, 'bad');
+    toast(`💔 ${name} (${crushLooks} лукс): «Прости... ты слишком саб»`);
   }
-  renderAll(); save();
-}
-document.getElementById('shootShot').onclick = shootShot;
+  renderStats(); renderRel(); save();
+};
 
-// ---------- Топ ----------
-// ---------- Тики: энергия + доход ----------
+// ---------- Ежедневный подарок ----------
+function todayStr(){ return new Date().toDateString(); }
+function renderDaily(){
+  const btn = document.getElementById('dailyBtn');
+  const desc = document.getElementById('dailyDesc');
+  if (S.lastDaily === todayStr()) {
+    btn.disabled = true; btn.style.opacity = .4; btn.textContent = 'Забрано ✓';
+    desc.textContent = `Серия: ${S.streak} дн. Приходи завтра.`;
+  } else {
+    btn.disabled = false; btn.style.opacity = 1;
+    btn.textContent = `Забрать подарок (серия ${S.streak} → ${S.streak+1})`;
+    desc.textContent = `Награда: ${fmt((S.streak+1)*500)}₽ + ${(S.streak+1)*5} ауры. Заходи каждый день — серия растёт.`;
+  }
+}
+document.getElementById('dailyBtn').onclick = () => {
+  if (S.lastDaily === todayStr()) return;
+  S.streak = (S.lastDaily === new Date(Date.now()-864e5).toDateString()) ? S.streak+1 : 1;
+  S.lastDaily = todayStr();
+  const gainM = S.streak*500, gainA = S.streak*5;
+  S.money += gainM; S.aura += gainA; S.energy = 100;
+  toast(`🎁 День ${S.streak}: +${fmt(gainM)}₽, +${gainA} ауры, энергия на максимум!`);
+  renderStats(); save();
+};
+document.getElementById('resetBtn').onclick = () => {
+  if (confirm('Точно сбросить весь прогресс?')) { localStorage.removeItem('moglife'); location.reload(); }
+};
+
+// ---------- Тики ----------
 setInterval(() => {
   S.energy = Math.min(100, S.energy + 3);
   const income = BIZ.filter(b => S.biz.includes(b.id)).reduce((a,b) => a+b.income, 0);
   if (income) S.money += income;
-  renderStats(); save();
+  save(); renderStats();
+  if (!document.getElementById('battle').classList.contains('hidden')) renderBattle();
 }, 5000);
 
-// ---------- Табы ----------
+// ---------- Навигация ----------
 document.querySelectorAll('.navitem').forEach(t => {
   t.onclick = () => {
     document.querySelectorAll('.navitem').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-    document.getElementById(t.dataset.tab).classList.remove('hidden');
+    const sec = document.getElementById(t.dataset.tab);
+    sec.classList.remove('hidden');
+    if (t.dataset.tab === 'battle') renderBattle();
   };
 });
 
+function renderAll(){
+  renderStats();
+  renderCards(TRAIN, 'trainGrid');
+  renderCards(BIZ, 'bizGrid', S.biz, true);
+  renderCards(GRIND, 'grindGrid');
+  renderCards(ESTATE, 'estateGrid', S.estate);
+  renderRel();
+}
 renderAll();
-if (!S.log.length) logMsg(`👋 Привет, ${playerName}! Ты саб-3. Пора луксмаксить.`, 'good');
+save();
 </script>
 </body>
 </html>
